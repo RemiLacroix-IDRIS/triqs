@@ -158,7 +158,8 @@ namespace triqs::mesh {
     private:
     D _dom;
     long L;
-    domain_pt_t xmin, xmax, del, del_inv;
+    domain_pt_t xmin, xmax, del;
+    double del_inv;
     mutable make_mesh_range_rtype<linear_mesh> r_;
     size_t mesh_hash_ = 0;
   };

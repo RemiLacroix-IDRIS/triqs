@@ -31,7 +31,6 @@ namespace triqs::mesh {
   using nda::array;
   using nda::array_view;
   using nda::ellipsis;
-  // using nda::make_shape;
   using nda::eye;
   using nda::matrix;
   using nda::matrix_const_view;

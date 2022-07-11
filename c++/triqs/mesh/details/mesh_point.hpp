@@ -64,20 +64,20 @@ namespace triqs::mesh {
   };
 
 // libc++ does not yet implement ranges for now: use itertools
-#if defined(_LIBCPP_VERSION) and (__clang_major__ < 14)
+#if defined(_LIBCPP_VERSION) and (__clang_major__ < 15)
 
   template <typename M> auto make_mesh_range(M const &m) { return itertools::transform(itertools::range(0, m.size()), mesh_point_maker<M>{&m}); }
 
-  template <typename M> using make_mesh_range_rtype = itertools::details::transformed<itertools::range, triqs::mesh::mesh_point_maker<M>>;
+  template <typename M> using make_mesh_range_rtype = itertools::detail::transformed<itertools::range, triqs::mesh::mesh_point_maker<M>>;
 
 #else
 
   template <typename M> auto make_mesh_range(M const &m) {
-    return std::ranges::views::iota(0, m.size()) | std::ranges::views::transform(mesh_point_maker<M>{m});
+    return std::ranges::views::iota(0l, static_cast<long>(m.size())) | std::ranges::views::transform(mesh_point_maker<M>{&m});
   }
 
   template <typename M>
-  using make_mesh_range_rtype = std::ranges::transform_view<std::ranges::iota_view<M::linear_index_t, M::linear_index_t>, mesh_point_maker<M>>;
+  using make_mesh_range_rtype = std::ranges::transform_view<std::ranges::iota_view<typename M::linear_index_t, typename M::linear_index_t>, mesh_point_maker<M>>;
 
 #endif
 
@@ -93,12 +93,12 @@ namespace triqs::mesh {
 
   //  product range not part of c++20 standard
   template <typename... Ms> auto make_mesh_prod_range(prod<Ms...> const &m) {
-    auto f = [](auto... x) { return itertools::details::multiplied<Ms...>(x...); };
+    auto f = [](auto... x) { return itertools::detail::multiplied<Ms...>(x...); };
     return itertools::transform(triqs::tuple::apply(f, m.components()), mesh_point_maker<prod<Ms...>>{&m});
   }
 
   template <typename... Ms>
   using make_mesh_range_prod_rtype =
-     itertools::details::transformed<itertools::details::multiplied<Ms...>, triqs::mesh::mesh_point_maker<prod<Ms...>>>;
+     itertools::detail::transformed<itertools::detail::multiplied<Ms...>, triqs::mesh::mesh_point_maker<prod<Ms...>>>;
 
 } // namespace triqs::mesh

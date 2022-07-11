@@ -97,9 +97,9 @@ namespace triqs::mesh {
     }
   };
 
-    inline std::array<std::pair<cyclat::linear_index_t, one_t>, 1> get_interpolation_data(cyclat const & m, cyclat::index_t const &x)  {
-      return {std::pair<cyclat::linear_index_t, one_t>{m.index_to_linear(m.index_modulo(x)), {}}};
-    }
+  inline std::array<std::pair<cyclat::linear_index_t, one_t>, 1> get_interpolation_data(cyclat const & m, cyclat::index_t const &x)  {
+    return {std::pair<cyclat::linear_index_t, one_t>{m.index_to_linear(m.index_modulo(x)), {}}};
+  }
 
 
 } // namespace triqs::mesh
