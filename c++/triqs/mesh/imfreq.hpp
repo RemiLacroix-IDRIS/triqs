@@ -54,7 +54,7 @@ namespace triqs::mesh {
     using linear_index_t = long;
 
     ///type of the domain point
-    using domain_pt_t = typename domain_t::point_t;
+    using domain_pt_t = domain_t::point_t;
 
     /// Option for the constructor. Restrict to positive frequency or not
     enum class option { all_frequencies, positive_frequencies_only };
@@ -81,7 +81,8 @@ namespace triqs::mesh {
         _last_index     = n_iw - 1;
         _first_index    = -(_last_index + (is_fermion ? 1 : 0));
       }
-      r_ = make_mesh_range(*this);
+      r_         = make_mesh_range(*this);
+      mesh_hash_ = hash_args(dom.beta, dom.statistic, n_iw, opt);
     }
 
     /**
@@ -115,14 +116,14 @@ namespace triqs::mesh {
     ///
     bool operator!=(imfreq const &M) const { return !(operator==(M)); }
 
-    // -------------------- Accessors (from concept) -------------------
+    // -------------------- Mesh Concept -------------------
 
     [[nodiscard]] size_t mesh_hash() const { return mesh_hash_; }
 
-    /// The corresponding domain
+    /// The underlying domain
     domain_t const &domain() const { return _dom; }
 
-    /// Size (linear) of the mesh
+    /// The total number of points in the mesh
     long size() const { return _last_index - _first_index + 1; }
 
     /// Is the point in mesh ?
@@ -132,19 +133,19 @@ namespace triqs::mesh {
     bool is_within_boundary(matsubara_freq const &f) const { return is_within_boundary(f.n); }
 
     /// From an index of a point in the mesh, returns the corresponding point in the domain
-    domain_pt_t index_to_point(index_t idx) const {
+    [[nodiscard]] domain_pt_t index_to_point(index_t idx) const {
       EXPECTS(is_within_boundary(idx));
       return {idx.value, _dom.beta, _dom.statistic};
     }
 
     /// Flatten the index in the positive linear index for memory storage (almost trivial here).
-    long index_to_linear(index_t idx) const {
+    [[nodiscard]] linear_index_t index_to_linear(index_t idx) const {
       EXPECTS(is_within_boundary(idx));
       return idx.value - first_index();
     }
 
     /// Reverse of index_to_linear
-    index_t linear_to_index(long lidx) const { return {lidx + first_index()}; }
+    [[nodiscard]] index_t linear_to_index(linear_index_t lidx) const { return {lidx + first_index()}; }
 
     // -------------------- Accessors (other) -------------------
 
@@ -166,17 +167,13 @@ namespace triqs::mesh {
     /// maximum freq of the mesh
     dcomplex omega_max() const { return index_to_point(_last_index); }
 
-    // ///
-    // dcomplex index_to_point(int n) const { return 1i * M_PI * (2 * n + (_dom.statistic == Fermion)) / _dom.beta; }
-
     // -------------------- mesh_point -------------------
 
     /// Type of the mesh point
     struct mesh_point_t : public matsubara_freq {
       using mesh_t = imfreq;
-      // long index_; // NB: typename imfreq::index_t is _long. Non-convertible!
-      // typename imfreq::domain_t::point_t value_{};
-      typename imfreq::linear_index_t linear_index_{};
+
+      imfreq::linear_index_t linear_index_{};
       std::size_t mesh_hash_ = 0;
 
       mesh_point_t(matsubara_freq_domain const &domain, typename imfreq::index_t index, typename imfreq::linear_index_t linear_index,
@@ -213,11 +210,12 @@ namespace triqs::mesh {
     }
     [[nodiscard]] auto cend() const { return r_.end(); }
 
-    // -------------- Evaluation of a function on the grid --------------------------
+    // -------------------- print  -------------------
 
     friend std::ostream &operator<<(std::ostream &sout, imfreq const &m) {
       return sout << "Matsubara Freq Mesh of size " << m.size() << ", Domain: " << m.domain() << ", positive_only : " << m.positive_only();
     }
+
     // -------------------- HDF5 -------------------
 
     static std::string hdf5_format() { return "MeshImFreq"; }
@@ -235,7 +233,7 @@ namespace triqs::mesh {
     friend void h5_read(h5::group fg, std::string subgroup_name, imfreq &m) {
       h5::group gr = fg.open_group(subgroup_name);
       assert_hdf5_format(gr, m, true);
-      typename imfreq::domain_t dom;
+      imfreq::domain_t dom;
       long L;
       h5_read(gr, "domain", dom);
       h5_read(gr, "size", L);
@@ -243,8 +241,8 @@ namespace triqs::mesh {
       if (gr.has_key("positive_freq_only")) h5_read(gr, "positive_freq_only", pos_freq);
       if (gr.has_key("start_at_0")) h5_read(gr, "start_at_0", pos_freq); // backward compatibility only
       size_t n_iw = (pos_freq ? L : (L + 1) / 2); // positive freq, size is correct, otherwise divide by 2 (euclidian, ok for bosons).
-      auto opt     = (pos_freq == 1 ? option::positive_frequencies_only : option::all_frequencies);
-      m            = imfreq{std::move(dom), n_iw, opt};
+      auto opt    = (pos_freq == 1 ? option::positive_frequencies_only : option::all_frequencies);
+      m           = imfreq{std::move(dom), n_iw, opt};
     }
 
     // ------------------------------------------------
@@ -255,6 +253,10 @@ namespace triqs::mesh {
     long _first_index, _last_index;
     size_t mesh_hash_ = 0;
     mutable make_mesh_range_rtype<imfreq> r_;
+
+    public:
+    using const_iterator = decltype(r_.begin());
+    using iterator       = const_iterator;
   };
 
   inline std::array<std::pair<imfreq::linear_index_t, one_t>, 1> get_interpolation_data(imfreq const &m, long n) {

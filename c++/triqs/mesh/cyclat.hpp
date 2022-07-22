@@ -25,7 +25,6 @@
 namespace triqs::mesh {
 
   using lattice::bravais_lattice;
-  using nda::eye;
 
   ///
   class cyclat : public cluster_mesh {
@@ -52,7 +51,7 @@ namespace triqs::mesh {
 
     ///Construct  from three linear sizes assuming a cubic lattice (backward compatibility)
     cyclat(int L1 = 1, int L2 = 1, int L3 = 1)
-       : bl{eye<double>(3)}, cluster_mesh{eye<double>(3), matrix<long>{{{L1, 0, 0}, {0, L2, 0}, {0, 0, L3}}}} {}
+       : bl{nda::eye<double>(3)}, cluster_mesh{nda::eye<double>(3), matrix<long>{{{L1, 0, 0}, {0, L2, 0}, {0, 0, L3}}}} {}
 
     using domain_t = bravais_lattice;
     domain_t const &domain() const { return bl; }

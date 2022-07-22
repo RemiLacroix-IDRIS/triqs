@@ -114,16 +114,16 @@ namespace triqs::mesh {
 
     // -------------------------- Range & Iteration --------------------------
 
-    auto begin() const {
+    [[nodiscard]] auto begin() const {
       r_ = make_mesh_range(*this);
       return r_.begin();
     }
-    auto end() const { return r_.end(); }
-    auto cbegin() const {
+    [[nodiscard]] auto end() const { return r_.end(); }
+    [[nodiscard]] auto cbegin() const {
       r_ = make_mesh_range(*this);
       return r_.cbegin();
     }
-    auto cend() const { return r_.cend(); }
+    [[nodiscard]] auto cend() const { return r_.cend(); }
 
     //  -------------------------- HDF5  --------------------------
     /// Write into HDF5
@@ -162,6 +162,10 @@ namespace triqs::mesh {
     double del_inv;
     mutable make_mesh_range_rtype<linear_mesh> r_;
     size_t mesh_hash_ = 0;
+
+    public:
+    using const_iterator = decltype(r_.begin());
+    using iterator = const_iterator;
   };
 
   //-----------------------------------------------------------------------

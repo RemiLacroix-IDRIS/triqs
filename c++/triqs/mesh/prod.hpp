@@ -187,16 +187,19 @@ namespace triqs::mesh {
 
     // -------------------------- Range & Iteration --------------------------
 
-    auto begin() const {
+    [[nodiscard]] auto begin() const {
       r_ = make_mesh_prod_range<Ms...>(*this);
       return r_.begin();
     }
-    auto end() const { return r_.end(); }
-    auto cbegin() const {
+    [[nodiscard]] auto end() const { return r_.end(); }
+    [[nodiscard]] auto cbegin() const {
       r_ = make_mesh_prod_range<Ms...>(*this);
       return r_.cbegin();
     }
-    auto cend() const { return r_.cend(); }
+    [[nodiscard]] auto cend() const { return r_.cend(); }
+
+    using const_iterator = decltype(std::declval<imfreq>().begin());
+    using iterator = const_iterator;
 
     // -------------- Evaluation of a function on the grid --------------------------
 
@@ -249,40 +252,29 @@ namespace triqs::mesh {
 /// std::get (mesh) return the component...
 namespace std {
 
-  // mesh as tuple
-  // redundant with .get<pos>, but seems necessary.
-  template <size_t pos, typename... Ms> decltype(auto) get(triqs::mesh::prod<Ms...> const &m) { return std::get<pos>(m.components()); }
-
-  template <typename... Ms> class tuple_size<triqs::mesh::prod<Ms...>> {
-    public:
-    static const int value = sizeof...(Ms);
-  };
-
-  template <size_t N, typename... Ms> class tuple_element<N, triqs::mesh::prod<Ms...>> : public tuple_element<N, std::tuple<Ms...>> {};
-
-  /*
-   * // NON PRODUCT mesh, for generic code std::get<0> should work
-  // redundant with .get<pos>, but seems necessary.
-  template <size_t pos, typename M> auto const &get(M const &m) requires(models_mesh_concept<M>) {
-    static_assert(pos == 0, "std::get<N>() of a non cartesiant product mesh for N>0");
-    return m;
-  }
-
-  template <typename M> class tuple_size<M> {
-    public:
-    static const int value = 1;
-  };
-
-  template <size_t N, typename M> class tuple_element<N, M> { using type = M; };
-*/
-
+  //template <triqs::mesh::Mesh M> class tuple_size<M> : public std::integral_constant<size_t, 1> {};
+  //template <triqs::mesh::Mesh... Ms> class tuple_size<triqs::mesh::prod<Ms...>> : public std::integral_constant<size_t, sizeof...(Ms)> {};
+  template <typename... Ms> class tuple_size<triqs::mesh::prod<Ms...>> : public std::integral_constant<size_t, sizeof...(Ms)> {};
   template <triqs::mesh::MeshPoint MP> class tuple_size<MP> : public std::integral_constant<size_t, tuple_size<typename MP::mesh_t>::value> {};
 
-  // mesh_point as tuple
-  template <int pos, typename... Ms> decltype(auto) get(typename triqs::mesh::prod<Ms...>::mesh_point_t const &m) {
+  // NON PRODUCT mesh, for generic code std::get<0> should work
+  // redundant with .get<pos>, but seems necessary.
+  //template <size_t pos, triqs::mesh::Mesh M> auto const &get(M const &m) {
+    //static_assert(pos == 0, "std::get<N>() of a non cartesiant product mesh for N>0");
+    //return m;
+  //}
+  //template <size_t pos, triqs::mesh::Mesh... Ms> decltype(auto) get(triqs::mesh::prod<Ms...> const &m) { return std::get<pos>(m.components()); }
+  template <size_t pos, typename... Ms> decltype(auto) get(triqs::mesh::prod<Ms...> const &m) { return std::get<pos>(m.components()); }
+  template <size_t pos, typename... Ms> decltype(auto) get(typename triqs::mesh::prod<Ms...>::mesh_point_t const &m) {
     return std::get<pos>(m.components_tuple());
   }
 
+  //template <size_t pos, triqs::mesh::Mesh M> class tuple_element<pos, M> {
+    //static_assert(pos == 0, "std::get<N>() of a non cartesiant product mesh for N>0");
+    //using type = M;
+  //};
+  //template <size_t N, triqs::mesh::Mesh... Ms> class tuple_element<N, triqs::mesh::prod<Ms...>> : public tuple_element<N, std::tuple<Ms...>> {};
+  template <size_t N, typename... Ms> class tuple_element<N, triqs::mesh::prod<Ms...>> : public tuple_element<N, std::tuple<Ms...>> {};
   template <size_t N, triqs::mesh::MeshPoint MP> class tuple_element<N, MP> {
     public:
     using type = typename tuple_element<N, typename MP::mesh_t>::type::mesh_point_t;
@@ -293,19 +285,19 @@ namespace std {
 // ----- product of mesh ---------------
 namespace triqs::mesh {
 
-  template <typename... M1, typename... M2> auto operator*(prod<M1...> const &m1, prod<M2...> const &m2) {
+  template <Mesh... M1, Mesh... M2> auto operator*(prod<M1...> const &m1, prod<M2...> const &m2) {
     return prod<M1..., M2...>{std::tuple_cat(m1.components(), m2.components())};
   }
 
-  template <typename M1, typename... M2> auto operator*(M1 const &m1, prod<M2...> const &m2) {
+  template <Mesh M1, Mesh... M2> auto operator*(M1 const &m1, prod<M2...> const &m2) {
     return prod<M1, M2...>{std::tuple_cat(std::make_tuple(m1), m2.components())};
   }
 
-  template <typename... M1, typename M2> auto operator*(prod<M1...> const &m1, M2 const &m2) {
+  template <Mesh... M1, Mesh M2> auto operator*(prod<M1...> const &m1, M2 const &m2) {
     return prod<M1..., M2>{std::tuple_cat(m1.components(), std::make_tuple(m2))};
   }
 
-  template <typename M1, typename M2>
+  template <Mesh M1, Mesh M2>
      auto operator*(M1 const &m1, M2 const &m2) //
      requires(models_mesh_concept_v<M1> or Mesh<M1>)
      and (models_mesh_concept_v<M2> or Mesh<M2>) {

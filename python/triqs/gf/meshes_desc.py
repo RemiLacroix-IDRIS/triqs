@@ -49,7 +49,7 @@ def make_mesh(py_type, c_tag, index_type='long', doc=""):
             c_type = "%s"%c_tag,
             c_type_absolute = "triqs::mesh::%s"%c_tag,
             hdf5 = True,
-            serializable= "tuple",
+            serializable= "h5",
             is_printable= True,
             comparisons = "== !=",
             doc = doc
@@ -143,7 +143,7 @@ module.add_class(m)
 dom = class_( py_type = "GfLegendreDomain",
         c_type = "legendre_domain",
         c_type_absolute = "triqs::mesh::legendre_domain",
-        serializable= "tuple",
+        serializable= "h5",
        )
 dom.add_constructor(signature = "(double beta, statistic_enum S, int max_n)")
 module.add_class(dom)

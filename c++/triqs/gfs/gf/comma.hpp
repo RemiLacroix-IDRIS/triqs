@@ -26,7 +26,6 @@
 namespace triqs::gfs {
 
   using clef::placeholder;
-  using mesh::mesh_point;
 
   /* ---------------------------------------------------------------------------------------------------
   * Tuple of placeholder

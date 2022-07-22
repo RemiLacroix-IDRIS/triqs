@@ -78,8 +78,8 @@ namespace triqs::gfs {
     // Construct a temporary imaginary-time Green's function gt
     // I set Nt time bins. This is ugly, one day we must code the direct
     // transformation without going through imaginary time
-    int Nt  = 50000;
-    auto gt = gf<imtime, typename std::decay_t<G1>::target_t>{{gw.domain(), Nt}, stdutil::front_pop(gw.data().shape())};
+    long Nt  = 50000;
+    auto gt = gf<imtime, typename std::decay_t<G1>::target_t>{{mesh::matsubara_time_domain(gw.domain()), Nt}, stdutil::front_pop(gw.data().shape())};
 
     // We first transform to imaginary time because it's been coded with the knowledge of the tails
     gt() = fourier(gw);

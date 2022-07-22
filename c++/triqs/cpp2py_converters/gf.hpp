@@ -18,6 +18,8 @@
 // Authors: Olivier Parcollet, Nils Wentzell
 
 #pragma once
+#include <triqs/gfs.hpp>
+#include <triqs/mesh/mesh_concepts.hpp>
 #include <triqs/utility/typeid_name.hpp>
 #include <triqs/cpp2py_converters/arrays.hpp>
 
@@ -103,13 +105,13 @@ namespace cpp2py {
     }
   };
 
-  template <typename M, typename V = void> constexpr bool has_weights                                     = false;
-  template <typename M> constexpr bool has_weights<M, std::void_t<decltype(std::declval<M>().weights())>> = true;
+  template <triqs::mesh::MeshPoint MP, typename V = void> constexpr bool has_weight                                      = false;
+  template <triqs::mesh::MeshPoint MP> constexpr bool has_weight<MP, std::void_t<decltype(std::declval<MP>().weight())>> = true;
 
   // Converter of mesh_point
-  template <typename M> struct py_converter<M::mesh_point_t> {
+  template <triqs::mesh::MeshPoint MP> struct py_converter<MP> {
 
-    using c_type = M::mesh_point_t;
+    using c_type = MP;
 
     static PyObject *c2py(c_type const &p) {
 
@@ -125,7 +127,7 @@ namespace cpp2py {
       pyref val = convert_to_python(static_cast<typename c_type::cast_t>(p));
       if (val.is_null()) return NULL;
 
-      if constexpr (has_weights<M>) {
+      if constexpr (has_weight<MP>) {
         pyref weight = convert_to_python(p.weight());
         if (weight.is_null()) return NULL;
         return PyObject_Call(cls, pyref::make_tuple(lidx, idx, val, weight), NULL);

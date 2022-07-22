@@ -90,6 +90,8 @@ TEST(Gkom, Eval) {
   auto bz = brillouin_zone{bravais_lattice{nda::eye<double>(2)}};
   auto g  = gf<prod<brzone, imfreq>, scalar_valued>{{{bz, n_k}, {beta, Fermion, n_w}}};
 
+  static_assert(std::tuple_size_v<prod<brzone, imfreq>> == 2);
+  static_assert(std::tuple_size_v<prod<brzone, imfreq>::mesh_point_t> == 2);
   //Gk(k_) << -2 * (cos(k_(0)) + cos(k_(1)));
   for (auto [k, w] : g.mesh()) g[k, w] = 1 / (w + 3 + 2 * (cos(k(0)) + cos(k(1))));
 

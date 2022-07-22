@@ -46,6 +46,9 @@ namespace triqs {
        */
       explicit brillouin_zone(bravais_lattice const &bl);
 
+      /// Check if a point_t is part of the domain
+      [[nodiscard]] bool contains(point_t const &pt) const { return true; }
+
       /// Access to the underlying bravais lattice
       bravais_lattice const & lattice() const { return lattice_; }
 
@@ -95,14 +98,6 @@ namespace triqs {
       friend void h5_read(h5::group fg, std::string subgroup_name, brillouin_zone &bz);
 
       // ---------------------------------------
-
-      //  BOOST Serialization
-      friend class boost::serialization::access;
-      template <class Archive> void serialize(Archive &ar, const unsigned int version) {
-	ar &lattice_ ;
-	ar &K_reciprocal;
-       ar &K_reciprocal_inv;
-      }
 
       private:
       bravais_lattice lattice_;

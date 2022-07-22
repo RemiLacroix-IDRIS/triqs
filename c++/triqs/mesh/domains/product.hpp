@@ -19,6 +19,7 @@
 
 #pragma once
 #include "triqs/utility/tuple_tools.hpp"
+#include <h5/h5.hpp>
 #include <tuple>
 
 namespace triqs::mesh {
@@ -37,6 +38,23 @@ namespace triqs::mesh {
     }
 
     friend bool operator==(domain_product const &D1, domain_product const &D2) { return D1.domains == D2.domains; }
-    // implement boost serializable, hdf5 if needed... (done at the mesh level).
+
+    static std::string hdf5_format() { return "DomainProduct"; }
+
+    /// Write into HDF5
+    friend void h5_write(h5::group fg, std::string const &subgroup_name, domain_product const &dp) {
+      h5::group gr = fg.create_group(subgroup_name);
+      write_hdf5_format(gr, dp);
+      auto l = [gr](int N, auto const &d) { h5_write(gr, "DomainComponent" + std::to_string(N), d); };
+      triqs::tuple::for_each_enumerate(dp.domains, l);
+    }
+
+    /// Read from HDF5
+    friend void h5_read(h5::group fg, std::string const &subgroup_name, domain_product &dp) {
+      h5::group gr = fg.open_group(subgroup_name);
+      assert_hdf5_format(gr, dp, true);
+      auto l = [gr](int N, auto &m) { h5_read(gr, "DomainComponent" + std::to_string(N), m); };
+      triqs::tuple::for_each_enumerate(dp.domains, l);
+    }
   };
 } // namespace triqs::mesh

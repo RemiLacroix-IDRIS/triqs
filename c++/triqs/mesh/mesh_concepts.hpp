@@ -27,9 +27,6 @@
 
 namespace triqs::mesh {
 
-  // Forward Declaration
-  template <typename M> struct mesh_point;
-
   template <typename T>
   concept Hashable = requires(T a) {
     { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
@@ -83,7 +80,7 @@ namespace triqs::mesh {
     // Is range which iterates over mesh points:
 
 // libc++ does not yet fully implement ranges for now: use itertools
-#if defined(_LIBCPP_VERSION) and (__clang_major__ < 14)
+#if defined(_LIBCPP_VERSION) and (__clang_major__ < 15)
     // requires std::forward_iterator<std::ranges::iterator_t<M>>;  // Currently itertools::transform is not constructible
     {m.size()};
 #else

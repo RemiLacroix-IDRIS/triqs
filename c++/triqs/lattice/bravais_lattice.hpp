@@ -99,15 +99,6 @@ namespace triqs {
 
       // ---------------------------------------
 
-      //  BOOST Serialization
-      friend class boost::serialization::access;
-      template <class Archive> void serialize(Archive &ar, const unsigned int version) {
-        ar &ndim_;
-        ar &units_;
-        ar &atom_orb_pos;
-        ar &atom_orb_name;
-      }
-
       private:
       matrix<double> units_;
       std::vector<r_t> atom_orb_pos;          // atom_orb_pos[i] = position of ith atoms/orbitals in the unit cell
