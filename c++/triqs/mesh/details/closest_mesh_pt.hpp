@@ -58,21 +58,47 @@ namespace triqs::mesh {
   // brzone
   // ------------------------------------------------------
 
-  //template <typename Target> struct closest_point<brzone, Target> {
+  template <typename Target> struct closest_point<brzone, Target> {
 
-    //template <typename T> static brzone::index_t invoke(brzone const &m, closest_pt_wrap<T> const &p) {
+    template <typename T> static brzone::index_t invoke(brzone const &m, closest_pt_wrap<T> const &p) {
 
-      //// WRONG To be reimplemented
-      //brzone::index_t result; // array<Int, 3>
-      //// FIXME : works only on square lattice
-      //auto id = m.get_interpolation_data(p.value);
-      //for (int u = 0; u < 3; ++u) {
-      //int i     = (id[0].second[u] > id[1].second[u] ? 0 : 1);
-      //result[u] = id.ia[i][u];
-      //}
-      //return result;
-    //}
-  //};
+      // calculate k in the reciprocal basis
+      auto k_units = transpose(inverse(m.units())) * nda::vector_const_view<double>{{3}, p.value.data()};
+      long n1      = std::floor(k_units[0]);
+      long n2      = std::floor(k_units[1]);
+      long n3      = std::floor(k_units[2]);
+
+      // fold back to Brillouin zone
+      auto n_fold = m.index_modulo(std::array{n1, n2, n3});
+
+      // calculate coordinates relative to neighbors
+      auto w1 = k_units[0] - n1;
+      auto w2 = k_units[1] - n2;
+      auto w3 = k_units[2] - n3;
+
+      // prepare result container and distance measure
+      brzone::index_t res;
+      auto dst = std::numeric_limits<double>::infinity();
+
+      // find closest neighbor by comparing euclidean distances
+      for (auto const &[i1, i2, i3] : itertools::product_range(2, 2, 2)) {
+        std::array<double, 3> dst_vec = {w1 - i1, w2 - i2, w3 - i3};
+        auto dst_vecp                 = transpose(m.units()) * nda::vector_const_view<double>{{3}, dst_vec.data()};
+        auto dstp                     = nda::blas::dot(dst_vecp, dst_vecp);
+
+        // update result when distance is smaller than current
+        if (dstp < dst) {
+          dst    = dstp;
+          res[0] = n_fold[0] + i1;
+          res[1] = n_fold[1] + i2;
+          res[2] = n_fold[2] + i3;
+        }
+      }
+
+      // map to valid mesh index
+      return m.index_modulo(res);
+    }
+  };
 
   //-------------------------------------------------------
   // closest mesh point on the grid
