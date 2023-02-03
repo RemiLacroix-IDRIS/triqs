@@ -20,9 +20,7 @@
 #include <triqs/test_tools/gfs.hpp>
 using namespace triqs::lattice;
 
-TEST(Gf, ClosestMeshPoint) {
-
-  // test for retime mesh
+TEST(ClosestMeshPoint, ReTime) {
   double beta = 1;
   double tmax = 1;
   int N       = 12;
@@ -48,12 +46,14 @@ TEST(Gf, ClosestMeshPoint) {
 
   EXPECT_CLOSE(g[closest_mesh_pt(0.4)], 5.0 / (N - 1));
   EXPECT_CLOSE(g[closest_mesh_pt(-0.4)], -5.0 / (N - 1));
+}
 
-  // test for brzone mesh (use triangular lattice as reference)
+TEST(ClosestMeshPoint, BrZone) {
+  // use triangular lattice as reference
   int Nk     = 10;
   auto units = nda::matrix<double>{{1.0, 0.0}, {0.5, 0.5 * std::sqrt(3.0)}};
   auto bz    = brillouin_zone{bravais_lattice{units}};
-  auto gk    = gf<brzone, scalar_real_valued>{{bz, N}};
+  auto gk    = gf<brzone, scalar_real_valued>{{bz, Nk}};
 
   // initialize gk with nearest-neighbor tb dispersion
   triqs::clef::placeholder<1> k_;
@@ -62,9 +62,9 @@ TEST(Gf, ClosestMeshPoint) {
   // check if closest_mesh_pt(k) is k
   for (auto k : gk.mesh()) { EXPECT_CLOSE(gk[closest_mesh_pt(nda::vector<double>{k})], gk[k]); }
 
-  // check if closest_mesh_pt(k) is the one with shortest euclidean distance for random k
+  // check if closest_mesh_pt(k) is the one with shortest euclidean distance for random k in mesh
   for (int rep = 0; rep < 100; ++rep) {
-    nda::vector<double> v = {nda::rand() * Nk, nda::rand() * Nk, 0.0};
+    nda::vector<double> v = {nda::rand() * (Nk - 1), nda::rand() * (Nk - 1), 0.0};
     nda::vector<double> q = transpose(gk.mesh().units()) * v;
     auto g_expec          = 0.0;
     auto dst              = std::numeric_limits<double>::infinity();
