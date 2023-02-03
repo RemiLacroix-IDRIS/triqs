@@ -80,9 +80,16 @@ namespace triqs::mesh {
       brzone::index_t res;
       auto dst = std::numeric_limits<double>::infinity();
 
+      // check flatness along mesh dimensions
+      long r1 = 2;
+      if (std::get<0>(m.dims()) == 1) { r1 = 1; };
+      long r2 = 2;
+      if (std::get<1>(m.dims()) == 1) { r2 = 1; };
+      long r3 = 2;
+      if (std::get<2>(m.dims()) == 1) { r3 = 1; };
+
       // find nearest neighbor by comparing distances
-      // TODO: dimension check for speedup if dim < 3
-      for (auto const &[i1, i2, i3] : itertools::product_range(2, 2, 2)) {
+      for (auto const &[i1, i2, i3] : itertools::product_range(r1, r2, r3)) {
         std::array<double, 3> dst_vec = {w1 - i1, w2 - i2, w3 - i3};
         auto dst_vecp                 = transpose(m.units()) * nda::vector_const_view<double>{{3}, dst_vec.data()};
         auto dstp                     = nda::blas::dot(dst_vecp, dst_vecp);
