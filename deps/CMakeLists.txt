@@ -111,11 +111,12 @@ external_dependency(h5
 external_dependency(nda
   GIT_REPO https://github.com/TRIQS/nda
   VERSION 1.1
-  GIT_TAG DEV_CUDA_LINALG_MIGUEL
+  GIT_TAG sym_grp_pr
 ) 
 
 # -- cppdlr --
 external_dependency(cppdlr
   GIT_REPO https://github.com/flatironinstitute/cppdlr
   GIT_TAG main
+  GIT_TAG sym_grp_pr
 )
