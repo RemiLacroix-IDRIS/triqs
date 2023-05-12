@@ -32,7 +32,7 @@ namespace triqs {
 
     template<typename target_t>
     gf<dlr_coeffs, target_t> dlr_coeffs_from_dlr_imtime_impl(gf_const_view<dlr_imtime, target_t> g_tau) {
-      gf<dlr_coeffs, target_t> g_dlr{g_tau.mesh(), g_tau.target_shape()};
+      auto g_dlr = make_gf<dlr_coeffs>(dlr_coeffs(g_tau.mesh()), g_tau.target());
       g_dlr.data() = g_dlr.mesh().dlr_it().vals2coefs(g_tau.data());
       return g_dlr;
     }
@@ -53,7 +53,7 @@ namespace triqs {
 
     template<typename target_t>
     gf<dlr_imtime, target_t> dlr_imtime_from_dlr_coeffs_impl(gf_const_view<dlr_coeffs, target_t> g_dlr) {
-      auto g_tau = gf<dlr_imtime, target_t>{g_dlr.mesh()};
+      auto g_tau = make_gf<dlr_imtime>(dlr_imtime(g_dlr.mesh()), g_dlr.target());
       g_tau.data() = g_dlr.mesh().dlr_it().coefs2vals(g_dlr.data());
       return g_tau;
     }
@@ -77,7 +77,7 @@ namespace triqs {
     template<typename target_t>
     gf<dlr_coeffs, target_t> dlr_coeffs_from_dlr_imfreq_impl(
       gf_const_view<dlr_imfreq, target_t> g_iw) {
-      gf<dlr_coeffs, target_t> g_dlr{g_iw.mesh()};
+      auto g_dlr = make_gf<dlr_coeffs>(dlr_coeffs(g_iw.mesh()), g_iw.target());
       auto beta_inv = 1. / g_dlr.mesh().domain().beta;
       g_dlr.data() = beta_inv * g_dlr.mesh().dlr_if().vals2coefs(conj(g_iw).data());
       return g_dlr;
@@ -97,7 +97,7 @@ namespace triqs {
     
     template<typename target_t>
     gf<dlr_imfreq, target_t> dlr_imfreq_from_dlr_coeffs_impl(gf_const_view<dlr_coeffs, target_t> g_dlr) {
-      auto g_iw = gf<dlr_imfreq, target_t>{g_dlr.mesh()};
+      auto g_iw = make_gf<dlr_imfreq>(dlr_imfreq(g_dlr.mesh()), g_dlr.target());
       auto beta = g_dlr.mesh().domain().beta;
       g_iw.data() = -beta * conj(g_dlr.mesh().dlr_if().coefs2vals(g_dlr.data()));
       return g_iw;
