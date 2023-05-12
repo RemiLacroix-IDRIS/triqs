@@ -216,8 +216,13 @@ namespace triqs::mesh {
 
     nda::vector<nda::dcomplex> get_interpolation_data(nda::dcomplex iw) const {
       auto res = nda::zeros<nda::dcomplex>(size());
-      for (auto l : range(size()))
-	res[l] = -1./(iw + index_to_point(l) / domain().beta);
+      if( domain().statistic == Fermion ) {
+        for (auto l : range(size()))
+          res[l] = -1./(iw + index_to_point(l) / domain().beta);
+      } else {
+        for (auto l : range(size()))
+          res[l] = -1./(iw + index_to_point(l) / domain().beta) * std::tanh(0.5 * index_to_point(l));
+      }
       return res;
     }    
     
