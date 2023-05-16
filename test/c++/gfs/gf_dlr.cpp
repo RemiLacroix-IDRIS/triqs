@@ -314,6 +314,10 @@ TEST(Gf, dlr_imfreq_interpolation) {
   auto G_iw_ref = G_iw;
   G_iw_ref(iw_) << G_dlr(iw_); // Interpolate DLR in imaginary frequency
 
+  for (auto const &iw : G_iw.mesh()) {
+    EXPECT_CLOSE(G_iw[iw], G_iw_ref[iw]);
+  }
+  
   EXPECT_GF_NEAR(G_iw, G_iw_ref);
 }
 
@@ -347,7 +351,12 @@ TEST(Gf, dlr_coeffs_conversion) {
 
   auto G_iw_ref = G_iw;
   triqs::clef::placeholder<0> iw_;
-  G_iw_ref(iw_) << 1. / (iw_ + omega);
+  G_iw_ref(iw_) << 1. / (iw_ - omega);
+
+  for (auto const &iw : G_iw.mesh()) {
+    EXPECT_CLOSE(G_iw[iw], G_iw_ref[iw]);
+  }
+
   EXPECT_GF_NEAR(G_iw, G_iw_ref);
 }
 
@@ -421,7 +430,7 @@ TEST(Gf, dlr_dyson) {
 
   double beta   = 2.0;
   double lambda = 10.0;
-  double eps = 1e-10;
+  double eps = 1e-12;
 
   double e1 = 0.0;
   double e2 = 2.0;
@@ -439,9 +448,13 @@ TEST(Gf, dlr_dyson) {
   auto G_iw = dlr_imfreq_from_dlr_coeffs(G_dlr);
 
   auto G_iw_ref = G_iw;
-  G_iw_ref(iw_) << 1. / (iw_ + 1 - 1/(iw_ + 1));
-  EXPECT_GF_NEAR(G_iw, G_iw_ref);
+  G_iw_ref(iw_) << 0.5/(iw_ - e1) + 0.5/(iw_ - e2);
 
+  for (auto const &iw : G_iw.mesh()) {
+    EXPECT_CLOSE(G_iw[iw], G_iw_ref[iw]);
+  }
+
+  EXPECT_GF_NEAR(G_iw, G_iw_ref);
 }
 
 MAKE_MAIN;

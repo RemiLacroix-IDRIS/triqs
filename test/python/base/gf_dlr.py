@@ -63,11 +63,11 @@ class test_dlr_mesh(unittest.TestCase):
         wmesh = MeshDLRImFreq(beta, 'Fermion', lamb, eps)
 
         g_w = Gf(mesh=wmesh, target_shape=[])
-        g_w << inverse(iOmega_n + e)
+        g_w << inverse(iOmega_n - e)
         
         g_w_2 = Gf(mesh=wmesh, target_shape=[])
         for w in wmesh:
-            g_w_2[w] = 1/(w + e)
+            g_w_2[w] = 1/(w - e)
 
         np.testing.assert_array_almost_equal(g_w.data, g_w_2.data)
 
@@ -94,7 +94,7 @@ class test_dlr_mesh(unittest.TestCase):
         wmesh = MeshDLRImFreq(beta, 'Fermion', lamb, eps)
         g_w = Gf(mesh=wmesh, target_shape=[])
 
-        for w in wmesh: g_w[w] = 1/(w + e)
+        for w in wmesh: g_w[w] = 1/(w - e)
 
         g_c = dlr_coeffs_from_dlr_imfreq(g_w)
 
@@ -103,7 +103,7 @@ class test_dlr_mesh(unittest.TestCase):
 
 
     def test_dlr_gfs_imfreq_interp(self):
-
+    
         beta, eps, lamb = 1.337, 1e-12, 10.
         m = MeshDLRCoeffs(beta, 'Fermion', lamb, eps)
 

@@ -218,10 +218,10 @@ namespace triqs::mesh {
       auto res = nda::zeros<nda::dcomplex>(size());
       if( domain().statistic == Fermion ) {
         for (auto l : range(size()))
-          res[l] = -1./(iw + index_to_point(l) / domain().beta);
+          res[l] = -1./(iw - index_to_point(l) / domain().beta);
       } else {
         for (auto l : range(size()))
-          res[l] = -1./(iw + index_to_point(l) / domain().beta) * std::tanh(0.5 * index_to_point(l));
+          res[l] = -1./(iw - index_to_point(l) / domain().beta) * std::tanh(0.5 * index_to_point(l));
       }
       return res;
     }    

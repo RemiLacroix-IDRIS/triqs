@@ -79,7 +79,7 @@ namespace triqs {
       gf_const_view<dlr_imfreq, target_t> g_iw) {
       auto g_dlr = make_gf<dlr_coeffs>(dlr_coeffs(g_iw.mesh()), g_iw.target());
       auto beta_inv = 1. / g_dlr.mesh().domain().beta;
-      g_dlr.data() = beta_inv * g_dlr.mesh().dlr_if().vals2coefs(conj(g_iw).data());
+      g_dlr.data() = beta_inv * g_dlr.mesh().dlr_if().vals2coefs(g_iw.data());
       return g_dlr;
     }
 
@@ -99,7 +99,7 @@ namespace triqs {
     gf<dlr_imfreq, target_t> dlr_imfreq_from_dlr_coeffs_impl(gf_const_view<dlr_coeffs, target_t> g_dlr) {
       auto g_iw = make_gf<dlr_imfreq>(dlr_imfreq(g_dlr.mesh()), g_dlr.target());
       auto beta = g_dlr.mesh().domain().beta;
-      g_iw.data() = -beta * conj(g_dlr.mesh().dlr_if().coefs2vals(g_dlr.data()));
+      g_iw.data() = beta * g_dlr.mesh().dlr_if().coefs2vals(g_dlr.data());
       return g_iw;
     }
 
