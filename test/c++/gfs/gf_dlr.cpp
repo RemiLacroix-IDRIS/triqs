@@ -21,8 +21,8 @@
 TEST(Gf, dlr_imtime) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
   auto mesh = gf_mesh<triqs::mesh::dlr_imtime>{beta, Fermion, lambda, eps};
 
   std::cout << mesh << "\n";
@@ -42,7 +42,7 @@ TEST(Gf, dlr_imfreq_fermi) {
 
   double beta   = 2.0;
   double lambda = 1000.0;
-  double eps = 1e-10;
+  double eps = 1e-12;
   auto mesh = gf_mesh<triqs::mesh::dlr_imfreq>{beta, Fermion, lambda, eps};
 
   std::cout << mesh << "\n";
@@ -60,7 +60,7 @@ TEST(Gf, dlr_imfreq_bose) {
 
   double beta   = 2.0;
   double lambda = 1000.0;
-  double eps = 1e-10;
+  double eps = 1e-12;
   auto mesh = gf_mesh<triqs::mesh::dlr_imfreq>{beta, Boson, lambda, eps};
 
   std::cout << mesh << "\n";
@@ -79,8 +79,8 @@ TEST(Gf, dlr_coeffs) {
   // dlr_coeffs -> dlr_refreq
   
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
   auto mesh = gf_mesh<triqs::mesh::dlr_coeffs>{beta, Fermion, lambda, eps};
 
   std::cout << mesh << "\n";
@@ -97,8 +97,8 @@ TEST(Gf, dlr_coeffs) {
 TEST(Gf, dlr_coeffs_imtime) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
   
   auto cmesh = gf_mesh<triqs::mesh::dlr_coeffs>{beta, Fermion, lambda, eps};
   auto tmesh = gf_mesh<triqs::mesh::dlr_imtime>{beta, Fermion, lambda, eps};
@@ -126,7 +126,7 @@ TEST(Gf, dlr_coeffs_imtime) {
 TEST(Gf, dlr_imtime_grid) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
+  double lambda = 42.0;
   double eps    = 1e-10;
   double omega  = 1.337;
 
@@ -179,7 +179,7 @@ TEST(Gf, dlr_imtime_grid) {
 TEST(Gf, dlr_imfreq_grid) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
+  double lambda = 42.0;
   double eps    = 1e-10;
   double omega  = 1.337;
 
@@ -231,7 +231,7 @@ TEST(Gf, dlr_imfreq_grid) {
 
 TEST(Gf, dlr_imtime_grid_clef) {
   double beta   = 2.0;
-  double lambda = 10.0;
+  double lambda = 42.0;
   double eps    = 1e-10;
   double omega  = 1.337;
 
@@ -251,7 +251,7 @@ TEST(Gf, dlr_imtime_grid_clef) {
 
 TEST(Gf, dlr_imfreq_grid_clef) {
   double beta   = 2.0;
-  double lambda = 10.0;
+  double lambda = 42.0;
   double eps    = 1e-10;
   double omega  = 1.337;
 
@@ -272,8 +272,8 @@ TEST(Gf, dlr_imfreq_grid_clef) {
 TEST(Gf, dlr_imtime_interpolation) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
 
   long dlr_idx = 6; // Pick one DLR frequency
 
@@ -300,8 +300,8 @@ TEST(Gf, dlr_imtime_interpolation) {
 TEST(Gf, dlr_imfreq_interpolation) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
   double omega = 1.337;
 
   triqs::clef::placeholder<0> iw_;
@@ -324,8 +324,8 @@ TEST(Gf, dlr_imfreq_interpolation) {
 TEST(Gf, dlr_coeffs_conversion) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
   double omega = 1.337;
 
   triqs::clef::placeholder<0> tau_;
@@ -363,8 +363,8 @@ TEST(Gf, dlr_coeffs_conversion) {
 TEST(Gf, dlr_density) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
 
   auto G_tau = gf<triqs::mesh::dlr_imtime, scalar_valued>{{beta, Fermion, lambda, eps}};
 
@@ -385,8 +385,8 @@ TEST(Gf, dlr_density) {
 TEST(Gf, dlr_tau_rev) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
 
   auto G_tau = gf<triqs::mesh::dlr_imtime, scalar_valued>{{beta, Fermion, lambda, eps}};
 
@@ -410,8 +410,8 @@ TEST(Gf, dlr_tau_rev) {
 TEST(Gf, dlr_h5) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
-  double eps = 1e-10;
+  double lambda = 42.0;
+  double eps = 1e-12;
   double omega = 1.337;
 
   triqs::clef::placeholder<0> tau_;
@@ -429,7 +429,7 @@ TEST(Gf, dlr_h5) {
 TEST(Gf, dlr_dyson) {
 
   double beta   = 2.0;
-  double lambda = 10.0;
+  double lambda = 42.0;
   double eps = 1e-12;
 
   double e1 = 0.0;
